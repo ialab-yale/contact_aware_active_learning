@@ -8,9 +8,11 @@
 Code for <a href="">Behavior Synthesis via Contact-Aware Fisher Information Maximization</a>. Hrishikesh Sathyanarayan and Ian Abraham. In Robotics Science and Systems (RSS), 2025.
 </p>
 
-<p align="center">
+<!-- <p align="center">
     <img src="./figures/abstract/[ABS-FIG]-final_fig_stacked.png" alt="drawing" width="800"/>
-</p>
+</p> -->
+
+![Alt Text](./figures/abstract/[ABS-FIG]-final_fig_stacked.png)
 
 <p align="justify">
     Contact dynamics hold immense amounts of information that can improve a robot's ability to characterize and learn about objects in their environment through interactions.
