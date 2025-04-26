@@ -10,7 +10,7 @@ Code for <a href="">Behavior Synthesis via Contact-Aware Fisher Information Maxi
 </p>
 
 <p align="center">
-    <img src="./figures/[ABS-FIG]-final_fig_stacked.png" alt="drawing" width="800"/>
+    <img src="./figures/abstract/[ABS-FIG]-final_fig_stacked.png" alt="drawing" width="800"/>
 </p>
 
 <p align="justify">
