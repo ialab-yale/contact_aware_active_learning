@@ -15,8 +15,8 @@ from simulators.endeff_block_sim import Sim as ShapeSim
 # from simulators.endeff_wall_sim import Sim as FrictionSim
 
 # information classes
-from info_lib.endeff_block_fisher import Fisher as ShapeFisher
-from info_lib.endeff_wall_fisher import Fisher as FrictionFisher
+from _info_lib.endeff_block_fisher import Fisher as ShapeFisher
+from _info_lib.endeff_wall_fisher import Fisher as FrictionFisher
 
 # parameter estimators
 from cmap.cmap import ShapeCMAP
@@ -29,6 +29,7 @@ class ShapeEstimationExpDesController():
         
         # instantiate predictive sampler
         pred_sampler = CAPS(
+            ctrl_hrzn=25,
             ctrl_bounds=([-1.0,-1.0],[1.0,1.0]),
             pos_bounds=([-1.0,-1.0],[1.0,1.0]),
             vel_bounds=([-0.3,-0.3],[0.3,0.3])
@@ -56,14 +57,14 @@ class ShapeEstimationExpDesController():
         # save data
         def save():
             print("saving data")
-            with open(f'data/shape_est/exp_experiment_key{exp_num_seed}/'+'test'+'.pkl', 'wb') as file:
+            with open(f'data/shape_est/exp_experiment/'+'test_trajectory'+'.pkl', 'wb') as file:
                 pkl.dump(self.logger, file)
             print("data saved")
 
         # save results data
         def save_results():
             print("saving results")
-            with open(f'data/shape_est/exp_experiment_key{exp_num_seed}/res/'+'res'+'.pkl', 'wb') as file:
+            with open(f'data/shape_est/exp_experiment/res/'+'res'+'.pkl', 'wb') as file:
                 pkl.dump(self.reslogger, file)
             print("data saved")
 
@@ -91,9 +92,9 @@ class ShapeEstimationExpDesController():
             q, qdot = jnp.split(x, 2, axis=1)
             qb, qbdot = jnp.split(xb, 2, axis=1)
 
-            return -fish.get_outer(box_params,u,x_init,parvar) \
+            return -1e3*fish.get_outer(box_params,u,x_init,parvar) \
                     + 1e-5*jnp.sum(vmap(dyn_model.phi_n, in_axes=(0,0,None))(q,qb,box_params)**2) \
-                    + 1e-3*jnp.sum(qb**2) + 1.0*jnp.sum(qbdot**2)
+                    + 1e-3*jnp.sum(qb**2) + 1e-2*jnp.sum(qbdot**2)
         
         self.get_inf_cost = inf_cost
 
@@ -174,7 +175,7 @@ class FrictionEstimationExpDesController():
     """
     contact-aware experimental design algorithm
     """
-    def __init__(self, dyn_model, contact_model, mu_param_est: float, exp_num_seed: int):
+    def __init__(self, dyn_model, contact_model, cm_params: dict, exp_num_seed: int):
 
         # instantiate predictive sampler
         pred_sampler = CAPS(
@@ -188,7 +189,7 @@ class FrictionEstimationExpDesController():
         self.logger = {'x': [], 'lam': [], 'u': []}
 
         # scaled down contact model (mu is not scaled)
-        self.cm_params={'K': 800.0, 'C': 500.0, 'mu': mu_param_est, 'R': 70.0}
+        self.cm_params=cm_params
 
         # log data
         def log(data):
@@ -270,9 +271,6 @@ class FrictionEstimationExpDesController():
                     'u': ustar
                 }
 
-            # animate
-            # animate({'x': jnp.array(self.logger['x'])}, {'r': dyn_model.r_ee, 'wall_xpos': dyn_model.wall_xpos}, filename='experiment_test')
-
-            return jnp.array(self.logger['x']) # reference trajectory of ee, or xref
+            return jnp.array(self.logger['x'])
         
         self.run = run

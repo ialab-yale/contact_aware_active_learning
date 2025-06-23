@@ -69,9 +69,9 @@ class Fisher():
         
         self.get_outer = get_outer
 
-        def update_paramvar(parvar,cm_params,u,data,alpha=1e-6):
+        def update_paramvar(parvar,cm_params,u,x_init,alpha=1e-6):
             # obtain fisher information
-            fish = jnp.clip(alpha*get_fisher(cm_params,u,data), 0.0, 0.1)
+            fish = jnp.clip(alpha*get_fisher(cm_params,u,x_init), 0.0, 0.1)
             return jnp.clip((parvar**-1 + fish)**-1, 1e-10, jnp.inf)
         
         self.update_paramvar = update_paramvar

@@ -8,8 +8,8 @@ from numpy.linalg import inv, pinv
 import mediapy as media
 import dill as pkl
 
-from mj_assets_lib._utils.utilts import rot_err, getSitePose, getSiteVel, getSiteJacobian
-from mj_assets_lib._utils.sim import Sim
+from _mj_assets_lib._utils.utilts import rot_err, getSitePose, getSiteVel, getSiteJacobian
+from _mj_assets_lib._utils.sim import Sim
 
 
 class Mj_sim():
@@ -18,7 +18,7 @@ class Mj_sim():
                  T,
                  trial_num,
                  measurement_key):
-        self.franka_sim = Sim(fname='mj_assets_lib/xml/scene_torque_actuators.xml')
+        self.franka_sim = Sim(fname='_mj_assets_lib/xml/scene_torque_actuators.xml')
         self.x_ref = None
         self.t_reset = 500
         self.t_max = self.t_reset + T
@@ -264,10 +264,7 @@ class Mj_sim():
             self.log_contact_data(sim.model, sim.data)
             self.log_ee_data(sim.model, sim.data)
             self.log_ctrl_data(sim.model, sim.data)
-
-            # check body names undergoing contact
-            # self.check_contacts(sim.model, sim.data)
-
+            
             # render
             if render:
                 if viewer.is_alive:

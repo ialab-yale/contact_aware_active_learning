@@ -6,12 +6,12 @@ import dill as pkl
 import click
 
 # local imports
-from obj_models_lib.box import Box
-from contact_models_lib.contact_model_1D import SoftContactModel as SCM_1D
-from contact_models_lib.contact_model_2D import SoftContactModel as SCM_2D
-from dynamics_lib.endeff_block_dyn import EndEffBlockDyn
+from _obj_models_lib.box import Box
+from _contact_models_lib.contact_model_1D import SoftContactModel as SCM_1D
+from _contact_models_lib.contact_model_2D import SoftContactModel as SCM_2D
+from _dynamics_lib.endeff_block_dyn import EndEffBlockDyn
 from controllers.controllers import ShapeEstimationExpDesController, FrictionEstimationExpDesController
-from dynamics_lib.endeff_wall_dyn import EndEffWallDyn
+from _dynamics_lib.endeff_wall_dyn import EndEffWallDyn
 from simulators.endeff_wall_sim import Mj_sim
 from cmap.cmap import FrictionCMAP
 
@@ -47,7 +47,7 @@ class Main():
                     radius=0.025,
                 ),
                 contact_model=SCM_1D(
-                    model_params={'K': 100.0, 'C': 0.0} # 500, 0.0
+                    model_params={'K': 1000.0, 'C': 0.0}
                 ),
                 exp_num_seed=measure_seed
             )                     
@@ -55,18 +55,18 @@ class Main():
             # run
             expdes.run(
                         box_params=Box(
-                            l_box=1.0,      
-                            w_box=1.0,      
+                            l_box=0.6,      
+                            w_box=0.3,      
                             massblock=0.25,
                             inertiablock=0.004,
-                            ground_fric=0.2     
+                            ground_fric=0.3     
                         ).get_dict(),
                         T=total_time_iter
                     )
         
         def run_friction_experiments():
 
-            cm_params = {'K': 700000.0, 'C': 20000.0, 'mu': 0.9, 'R': 4000.0}
+            cm_params = {'K': 800.0, 'C': 500.0, 'mu': 0.9, 'R': 70.0}
             init_cm_params = cm_params
             fim = 0.0
             paramvariance = jnp.array([[10.0]])
@@ -103,7 +103,7 @@ class Main():
                 res_dict['fim'].append(fim)
 
                 # experimental design
-                xref = FrictionEstimationExpDesController(robot_obj(),contact_model_obj(),cm_params['mu'],measure_seed).run(total_time_iter)
+                xref = FrictionEstimationExpDesController(robot_obj(),contact_model_obj(),cm_params,measure_seed).run(total_time_iter)
                 
                 # simulate the reference trajectory
                 data = Mj_sim(T=total_time_iter,
@@ -141,7 +141,7 @@ class Main():
 
             # save data
             print("saving data")
-            with open(f'data/exp_experiment/res/results_with_noise{str(init_cm_params['mu']).replace('.', '')}.pkl', 'wb') as file:
+            with open(f'data/friction_est/exp_experiment/res/results_with_noise{str(init_cm_params['mu']).replace('.', '')}.pkl', 'wb') as file:
                 pkl.dump(res_dict, file)
             print("data saved")
 

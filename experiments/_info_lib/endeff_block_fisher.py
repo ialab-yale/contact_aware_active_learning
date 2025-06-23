@@ -22,18 +22,19 @@ class Fisher():
                 vmap(dyn_model.phi_n, in_axes=(0,0,None))(q,qb,box_params), 
                 vmap(dyn_model.contact_vel, in_axes=(0,0,None))(x,xb,box_params)
             )
+
             return lam
             return jnp.clip(lam / 100.0, 0.0, 10.0)
         
         self.contact_sensor_model = contact_sensor_model
 
         @jax.jit
-        def get_fisher(params,u,data):
+        def get_fisher(params,u,x_init):
             """
             returns the fisher information
             """
             # gradient of sensor model
-            grad_model = jacfwd(contact_sensor_model, argnums=0)(params,u,data)
+            grad_model = jacfwd(contact_sensor_model, argnums=0)(params,u,x_init)
             dY = jnp.hstack(
                 [
                     grad_model['l_box'],
@@ -47,12 +48,12 @@ class Fisher():
             return jnp.diag(jnp.diagonal(jnp.sum(dYdY,axis=0)))
 
         @jax.jit
-        def get_outer(params,u,data,parvar):
+        def get_outer(params,u,x_init,parvar):
             """
             T-optimality fim (sum)
             """
             # obtain fisher information
-            fish = get_fisher(params,u,data)
+            fish = get_fisher(params,u,x_init)
 
             # return the average trace of the fisher information
             return jnp.trace(jnp.diag(parvar)@fish)
@@ -60,9 +61,9 @@ class Fisher():
         self.get_outer = get_outer
 
         @jax.jit
-        def update_paramvar(parvar,params,u,data,alpha=1e-3):
+        def update_paramvar(parvar,params,u,x_init,alpha=1e-3):
             # obtain fisher information
-            fish = jnp.clip(alpha*get_fisher(params,u,data), 0.0, jnp.inf)
+            fish = jnp.clip(alpha*get_fisher(params,u,x_init), 0.0, jnp.inf)
             return jnp.clip((parvar**-1 + jnp.diagonal(fish))**-1, 1e-10, jnp.inf)
         
         self.update_paramvar = update_paramvar

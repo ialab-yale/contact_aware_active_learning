@@ -5,8 +5,8 @@ from jax import vmap, jacfwd, grad, lax
 import dill as pkl
 
 # locals
-from info_lib.endeff_block_fisher import Fisher as ShapeFisher
-from info_lib.endeff_wall_fisher import Fisher as FrictionFisher
+from _info_lib.endeff_block_fisher import Fisher as ShapeFisher
+from _info_lib.endeff_wall_fisher import Fisher as FrictionFisher
 
 from solvers.augmented_lagrangian import AugmentedLagrangeSolver as ALS
 
@@ -58,7 +58,7 @@ class ShapeCMAP():
                 )
 
                 # return the loss = contact least squares discrepancy + parameter least squares discrepancy
-                return jnp.sum((lam_sim - lam_pred)**2) \
+                return 1e3*jnp.sum((lam_sim - lam_pred)**2) \
                     + paramvariance[0]**-1 * jnp.sum((params['l_box'] - args['box_params']['l_box'])**2) \
                     + paramvariance[1]**-1 * jnp.sum((params['w_box'] - args['box_params']['w_box'])**2)
             
@@ -135,7 +135,7 @@ class FrictionCMAP():
             def get_lam_t(lam_n, contact_vel):
                 v_n, v_t = jnp.split(contact_vel, 2)
                 eps = 0.001
-                mj_limpref_scalar = 0.15 # 0.25, 0.125
+                mj_limpref_scalar = 0.26
                 return -mj_limpref_scalar*cm_params['mu']*lam_n*v_t/(jnp.sqrt(jnp.abs(v_t)**2 + eps**2))
                 return jnp.sign(v_t)*jnp.maximum(
                             -cm_params['mu']*lam_n,-cm_params['R']*jnp.abs(v_t)

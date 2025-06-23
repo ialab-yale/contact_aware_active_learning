@@ -6,8 +6,8 @@ import dill as pkl
 from tqdm import tqdm
 
 # local
-from obj_models_lib.box import Box
-from mpl_vis_lib.endeff_block_ani import animate
+from _obj_models_lib.box import Box
+from _mpl_vis_lib.endeff_block_ani import animate
 
 class Sim():
     """
@@ -33,7 +33,7 @@ class Sim():
                 w_box=0.3, 
                 massblock=0.25,
                 inertiablock=0.004,
-                ground_fric=0.2 
+                ground_fric=0.3 
             ).get_dict()
 
         # save real box parameters
