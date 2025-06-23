@@ -21,3 +21,16 @@ Code for <a href="">Behavior Synthesis via Contact-Aware Fisher Information Maxi
     We observe emergent robot behaviors that are able to excite contact interactions that efficiently learns object parameters across a range of parameter learning examples. 
     Last, we demonstrate the utility of contact-awareness for learning parameters through contact-seeking behaviors on several robotic experiments.
 </p>
+
+## Chosen Experimental Setups
+
+**Experimental Setup #1**: A robot end effector estimates the shape of a box (length and width) through non-prehensile contact interactions.
+
+**Experimental Setup #2**: A Franka robot interacts with a wall to estimate the wall-end effector friction coefficient.
+
+## Running Experiments
+To run a parameter learning experiment, execute
+```
+python experiments/main.py --exp_type 'shape' --total_time_iters 1000 --num_trials 10 --measure_seed 10
+```
+Here, `exp_type` can be chosen as either 'shape' or 'friction' experiments, `total_time_iters` sets the total time iterations for an experiment, `num_trials` sets the number of experimental runs (for friction experiments), and `measure_seed` sets the seed that attributes to measurement noise generation.
